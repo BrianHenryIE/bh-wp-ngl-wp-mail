@@ -11,30 +11,35 @@
  * @see https://github.com/pablo-sg-pacheco/wp-namespace-autoloader/
  */
 
-namespace BH_WP_NGL_WP_Mail;
+namespace BrianHenryIE\WP_NGL_WP_Mail;
 
-use BH_WP_NGL_WP_Mail\Pablo_Pacheco\WP_Namespace_Autoloader\WP_Namespace_Autoloader;
+use BrianHenryIE\WP_NGL_WP_Mail\Pablo_Pacheco\WP_Namespace_Autoloader\WP_Namespace_Autoloader;
 
-$class_map_files = array(
-    __DIR__ . '/autoload-classmap.php',
+add_action(
+	'plugins_loaded',
+	function(): void {
+
+		if ( ! defined( 'NGL_PLUGIN_DIR' ) ) {
+			return;
+		}
+
+		$class_map = array(
+			'NGL_Abstract_Integration' => NGL_PLUGIN_DIR . 'includes/abstract-integration.php',
+		);
+
+		if ( is_array( $class_map ) ) {
+			spl_autoload_register(
+				function ( $classname ) use ( $class_map ) {
+
+					if ( array_key_exists( $classname, $class_map ) && file_exists( $class_map[ $classname ] ) ) {
+						require_once $class_map[ $classname ];
+					}
+				}
+			);
+		}
+	},
+	0
 );
-foreach ( $class_map_files as $class_map_file ) {
-    if ( file_exists( $class_map_file ) ) {
-
-        $class_map = include $class_map_file;
-
-        if ( is_array( $class_map ) ) {
-            spl_autoload_register(
-                function ( $classname ) use ( $class_map ) {
-
-                    if ( array_key_exists( $classname, $class_map ) && file_exists( $class_map[ $classname ] ) ) {
-                        require_once $class_map[ $classname ];
-                    }
-                }
-            );
-        }
-    }
-}
 
 // Load strauss classes after autoload-classmap.php so classes can be substituted.
 require_once __DIR__ . '/strauss/autoload.php';

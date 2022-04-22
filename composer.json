@@ -33,9 +33,26 @@
         {
             "type":"composer",
             "url":"https://wpackagist.org"
+        },
+        {
+            "type": "composer",
+            "url": "https://bhwp.ie/satispress/"
+        },
+        {
+            "url": "https://github.com/BrianHenryIE/bh-wp-logger",
+            "type": "git"
+        },
+        {
+            "url": "https://github.com/BrianHenryIE/bh-wp-private-uploads",
+            "type": "git"
+        },
+        {
+            "url": "https://github.com/BrianHenryIE/admin-notices",
+            "type": "git"
         }
     ],
     "require": {
+        "brianhenryie/bh-wp-logger": "dev-master",
         "php": ">=7.4",
         "pablo-sg-pacheco/wp-namespace-autoloader": "*"
     },
@@ -60,6 +77,7 @@
         "phpcompatibility/phpcompatibility-wp": "*",
         "phpstan/extension-installer": "^1.1",
         "phpunit/phpcov": "*",
+        "satispress/newsletter-glue-pro": "^2.0",
         "squizlabs/php_codesniffer": "*",
         "szepeviktor/phpstan-wordpress": "^0.7.2",
         "voku/portable-ascii": "dev-master",
@@ -68,6 +86,7 @@
         "wp-cli/wp-cli-bundle": "*",
         "wp-coding-standards/wpcs": "*",
         "wpackagist-plugin/woocommerce": "^6.3",
+        "wpackagist-plugin/wp-mail-logging": "*",
         "wpackagist-theme/storefront": "^4.0",
         "wpackagist-theme/twentytwenty": "*"
     },
@@ -81,20 +100,16 @@
             }
         },
         "strauss": {
-            "namespace_prefix": "BH_WP_NGL_WP_Mail\\",
+            "namespace_prefix": "BrianHenryIE\\WP_NGL_WP_Mail\\",
             "target_directory": "/src/strauss/",
             "classmap_prefix": "BH_WP_NGL_WP_Mail_",
-            "override_autoload": {
-                "yahnis-elsts/plugin-update-checker": {
-                    "classmap": ["Puc"],
-                    "files": ["load-v4p11.php","vendor/PucReadmeParser.php"]
-                },
-                "erusev/parsedown": {
-                    "files": ["Parsedown.php"]
-                }
+            "namespace_replacement_patterns": {
+                "~BrianHenryIE\\\\(.*)~" : "BrianHenryIE\\WP_NGL_WP_Mail\\\\$1"
             },
-            "exclude_from_prefix": {
-                "packages": ["yahnis-elsts/plugin-update-checker","erusev/parsedown"]
+            "exclude_from_copy": {
+                "file_patterns": [
+                    "~psr/log/Psr/Log/Test.*~"
+                ]
             }
         },
         "symlinks": {

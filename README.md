@@ -1,93 +1,50 @@
-[![WordPress tested 5.8](https://img.shields.io/badge/WordPress-v5.8%20tested-0073aa.svg)](https://wordpress.org/plugins/bh-wp-ngl-wp-mail) [![PHPCS WPCS](https://img.shields.io/badge/PHPCS-WordPress%20Coding%20Standards-8892BF.svg)](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) [![PHPUnit ](.github/coverage.svg)](https://brianhenryie.github.io/bh-wp-ngl-wp-mail/)
+[![WordPress tested 5.9](https://img.shields.io/badge/WordPress-v5.9%20tested-0073aa.svg)](https://wordpress.org/plugins/bh-wp-ngl-wp-mail) [![PHPUnit ](.github/coverage.svg)](https://brianhenryie.github.io/bh-wp-ngl-wp-mail/) [![PHPStan ](https://img.shields.io/badge/PHPStan-Level%208-2a5ea7.svg)](https://github.com/szepeviktor/phpstan-wordpress)
 
 # BH WP NGL WP Mail
 
-## Contributing
+Adds `wp_mail()` as a sending option to [Newsletter Glue](https://newsletterglue.com/) for WordPress.
 
-Clone this repo, open PhpStorm, then run `composer install` to install the dependencies.
+I already have WP Offload SES configured, which itself manages a sending queue, and all my SPF/DKIM are tuned in, so why not use it?
 
-```
-git clone https://github.com/brianhenryie/bh-wp-ngl-wp-mail.git;
-open -a PhpStorm ./;
-composer install;
-```
+![Connected Integration](./assets/connected-integration.png "wp_mail() sending for Newsletter Glue")
 
-For integration and acceptance tests, a local webserver must be running with `localhost:8080/bh-wp-ngl-wp-mail/` pointing at the root of the repo. MySQL must also be running locally – with two databases set up with:
+There is no way to avoid the "API key" field, so any value in there is adequate.
 
-```
-mysql_username="root"
-mysql_password="secret"
+The plugin uses WordPress users and (currently) user roles for its mailing lists. To handle unsubscribed users, it adds a new user role `bh_ngl_unsubscribed`. The `bounced_email` role here is from [AWS SES Bounce Handler](https://github.com/BrianHenryIE/bh-wp-aws-ses-bounce-handler/).  
 
-# export PATH=${PATH}:/usr/local/mysql/bin
+It integrates with Newsletter Glue's subscribe form by subscribing an existing WordPress user or creating a `WP_User` and not sending the new user email. Double-opt-in has not been developed yet.
 
-# Make .env available 
-# Bash:
-export $(grep -v '^#' .env.testing | xargs)
-# Zsh:
-source .env.testing
+![Subscribe Form](./assets/subscribe-form.png "Standard Newsletter Glue Subscription Form")
 
-# Create the database user:
-# MySQL
-mysql -u $mysql_username -p$mysql_password -e "CREATE USER '"$TEST_DB_USER"'@'%' IDENTIFIED WITH mysql_native_password BY '"$TEST_DB_PASSWORD"';";
-# MariaDB
-mysql -u $mysql_username -p$mysql_password -e "CREATE USER '"$TEST_DB_USER"'@'%' IDENTIFIED BY '"$TEST_DB_PASSWORD"';";
+A hash of the `WP_User` `user_registered` date and the newsletter's post id are used to create an unsubscribe link which updates the placeholder in the newsletter body.
 
-# Create the databases:
-mysql -u $mysql_username -p$mysql_password -e "CREATE DATABASE "$TEST_SITE_DB_NAME"; USE "$TEST_SITE_DB_NAME"; GRANT ALL PRIVILEGES ON "$TEST_SITE_DB_NAME".* TO '"$TEST_DB_USER"'@'%';";
-mysql -u $mysql_username -p$mysql_password -e "CREATE DATABASE "$TEST_DB_NAME"; USE "$TEST_DB_NAME"; GRANT ALL PRIVILEGES ON "$TEST_DB_NAME".* TO '"$TEST_DB_USER"'@'%';";
+![Email Footer](./assets/email-footer.png "Email Footer")
 
-# Import the WordPress database:
-mysql -u $mysql_username -p$mysql_password $TEST_SITE_DB_NAME < tests/_data/dump.sql
-```
+The unsubscribe URL is also added to the emails' `List-Unsubscribe` header. Email clients know to POST to that URL, and if it is visited in a web browser, a small piece of JavaScript is used to unsubscribe the user. This way, GET requests by email clients prefetching or by spiders do not unsubscribe the user.
 
-### WordPress Coding Standards
+![Email Headers](./assets/list-unsubscribe.png "Email Headers")
 
-See documentation on [WordPress.org](https://make.wordpress.org/core/handbook/best-practices/coding-standards/) and [GitHub.com](https://github.com/WordPress/WordPress-Coding-Standards).
+## Install
 
-Correct errors where possible and list the remaining with:
+[Download the latest .zip from the GitHub releases](https://github.com/BrianHenryIE/bh-wp-ngl-wp-mail/releases).
 
-```
-vendor/bin/phpcbf; vendor/bin/phpcs
-```
+## Status
 
-### Tests
+This is not being used in production by me yet. Consider this incomplete, but nearly there.
 
-Tests use the [Codeception](https://codeception.com/) add-on [WP-Browser](https://github.com/lucatume/wp-browser) and include vanilla PHPUnit tests with [WP_Mock](https://github.com/10up/wp_mock). 
+The way I have used user roles for mailing lists will not scale. Roles are stored in post meta `wp_user_roles` key as an array. A more sensible way to create lists would be custom taxonomies. 
 
-Run tests with:
+I expect there is already a good CRM type plugin that this could integrate with. Please share suggestions.
 
-```
-vendor/bin/codecept run unit;
-vendor/bin/codecept run wpunit;
-vendor/bin/codecept run integration;
-vendor/bin/codecept run acceptance;
-```
+Ultimately, I'd like to be able to dynamically build mailing lists, e.g. WooCommerce customers who previously purchased product X but have not purchased it in the past 30 days. 
 
-Show code coverage (unit+wpunit):
+## See Also
 
-```
-XDEBUG_MODE=coverage composer run-script coverage-tests 
-```
+* Add additional unsubscribe functionality for users with [One-Click List-Unsubscribe Mailto: Header](https://github.com/BrianHenryIE/bh-wp-one-click-list-unsubscribe-mailto-header)
+* Handle bounced and unsubscribes from AWS SES using [AWS SES Bounce Handler](https://github.com/BrianHenryIE/bh-wp-aws-ses-bounce-handler/)
+* Log users in automatically through links in emails with [Autologin URLs](https://github.com/BrianHenryIE/bh-wp-autologin-urls)
 
-```
-vendor/bin/phpstan analyse --memory-limit 1G
-```
-
-To save changes made to the acceptance database:
-
-```
-export $(grep -v '^#' .env.testing | xargs)
-mysqldump -u $TEST_SITE_DB_USER -p$TEST_SITE_DB_PASSWORD $TEST_SITE_DB_NAME > tests/_data/dump.sql
-```
-
-To clear Codeception cache after moving/removing test files:
-
-```
-vendor/bin/codecept clean
-```
-
-### More Information
-
-See [github.com/BrianHenryIE/WordPress-Plugin-Boilerplate](https://github.com/BrianHenryIE/WordPress-Plugin-Boilerplate) for initial setup rationale. 
 
 # Acknowledgements
+
+Thank you to Newsletter Glue support for replying to all my emails!

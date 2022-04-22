@@ -6,9 +6,9 @@
  * @author     BrianHenryIE <BrianHenryIE@gmail.com>
  */
 
-namespace BH_WP_NGL_WP_Mail;
+namespace BrianHenryIE\WP_NGL_WP_Mail;
 
-use BH_WP_NGL_WP_Mail\Includes\BH_WP_NGL_WP_Mail;
+use BrianHenryIE\WP_NGL_WP_Mail\WP_Includes\BH_WP_NGL_WP_Mail;
 
 /**
  * Verifies the plugin has been instantiated and added to PHP's $GLOBALS variable.

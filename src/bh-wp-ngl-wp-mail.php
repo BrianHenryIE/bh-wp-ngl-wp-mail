@@ -9,12 +9,12 @@
  *
  * @link              http://example.com
  * @since             1.0.0
- * @package           BH_WP_NGL_WP_Mail
+ * @package           brianhenryie/bh-wp-ngl-wp-mail
  *
  * @wordpress-plugin
- * Plugin Name:       BH WP NGL WP Mail
- * Plugin URI:        http://github.com/username/bh-wp-ngl-wp-mail/
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Plugin Name:       Newsletter Glue wp_mail() Integration
+ * Plugin URI:        http://github.com/BrianHenryIE/bh-wp-ngl-wp-mail/
+ * Description:       Adds WordPress's native email sender as an option in Newsletter glue.
  * Version:           1.0.0
  * Requires PHP:      7.4
  * Author:            BrianHenryIE
@@ -25,11 +25,16 @@
  * Domain Path:       /languages
  */
 
-namespace BH_WP_NGL_WP_Mail;
+namespace BrianHenryIE\WP_NGL_WP_Mail;
 
-use BH_WP_NGL_WP_Mail\Includes\Activator;
-use BH_WP_NGL_WP_Mail\Includes\Deactivator;
-use BH_WP_NGL_WP_Mail\Includes\BH_WP_NGL_WP_Mail;
+use BrianHenryIE\WP_NGL_WP_Mail\WP_Includes\Activator;
+use BrianHenryIE\WP_NGL_WP_Mail\WP_Includes\Deactivator;
+use BrianHenryIE\WP_NGL_WP_Mail\WP_Includes\BH_WP_NGL_WP_Mail;
+use BrianHenryIE\WP_NGL_WP_Mail\WP_Includes\User;
+use BrianHenryIE\WP_NGL_WP_Mail\WP_Logger\Logger;
+use BrianHenryIE\WP_NGL_WP_Mail\WP_Logger\Logger_Settings_Interface;
+use BrianHenryIE\WP_NGL_WP_Mail\WP_Logger\Logger_Settings_Trait;
+use Psr\Log\LogLevel;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -38,14 +43,9 @@ if ( ! defined( 'WPINC' ) ) {
 
 require_once plugin_dir_path( __FILE__ ) . 'autoload.php';
 
-/**
- * Current plugin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
- * Rename this for your plugin and update it as you release new versions.
- */
 define( 'BH_WP_NGL_WP_MAIL_VERSION', '1.0.0' );
-
 define( 'BH_WP_NGL_WP_MAIL_BASENAME', plugin_basename( __FILE__ ) );
+define( 'BH_WP_NGL_WP_MAIL_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
 register_activation_hook( __FILE__, array( Activator::class, 'activate' ) );
 register_deactivation_hook( __FILE__, array( Deactivator::class, 'deactivate' ) );
@@ -61,7 +61,29 @@ register_deactivation_hook( __FILE__, array( Deactivator::class, 'deactivate' ) 
  */
 function instantiate_bh_wp_ngl_wp_mail(): BH_WP_NGL_WP_Mail {
 
-	$plugin = new BH_WP_NGL_WP_Mail();
+	$settings = new class() implements Logger_Settings_Interface {
+		use Logger_Settings_Trait;
+
+		public function get_log_level(): string {
+			return LogLevel::DEBUG;
+		}
+
+		public function get_plugin_name(): string {
+			return 'Newsletter Glue wp_mail() Integration';
+		}
+
+		public function get_plugin_slug(): string {
+			return 'bh-wp-ngl-wp-mail';
+		}
+
+		public function get_plugin_basename(): string {
+			return defined( 'BH_WP_NGL_WP_MAIL_BASENAME' ) ? BH_WP_NGL_WP_MAIL_BASENAME : 'bh-wp-ngl-wp-mail/bh-wp-ngl-wp-mail.php';
+		}
+	};
+
+	$logger = Logger::instance( $settings );
+
+	$plugin = new BH_WP_NGL_WP_Mail( $logger );
 
 	return $plugin;
 }

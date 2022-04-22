@@ -18,6 +18,6 @@ modules:
             domain: "%TEST_SITE_WP_DOMAIN%"
             adminEmail: "%TEST_SITE_ADMIN_EMAIL%"
             title: "bh-wp-ngl-wp-mail"
-            plugins: []
-            activatePlugins: []
+            plugins: ['newsletter-glue-pro/newsletter-glue.php']
+            activatePlugins: ['newsletter-glue-pro/newsletter-glue.php']
 bootstrap: _bootstrap.php

@@ -6,7 +6,7 @@
  * @author  BrianHenryIE <BrianHenryIE@gmail.com>
  */
 
-namespace BH_WP_NGL_WP_Mail\Includes;
+namespace BrianHenryIE\WP_NGL_WP_Mail\WP_Includes;
 
 /**
  * Class BH_WP_NGL_WP_Mail_Test

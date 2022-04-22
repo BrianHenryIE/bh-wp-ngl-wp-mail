@@ -2,7 +2,7 @@
 /**
  * Silence is golden.
  *
- * @package    BH_WP_NGL_WP_Mail
+ * @package    brianhenryie/bh-wp-ngl-wp-mail
  */
 
 die();

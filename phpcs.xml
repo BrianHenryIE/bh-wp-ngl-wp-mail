@@ -60,4 +60,11 @@
         <exclude-pattern>*/tests/acceptance/*</exclude-pattern>
     </rule>
 
+
+    <rule ref="WordPress.WP.GlobalVariablesOverride.Prohibited">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+
+
+
 </ruleset>
