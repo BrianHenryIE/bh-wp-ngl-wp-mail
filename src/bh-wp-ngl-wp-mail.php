@@ -15,7 +15,7 @@
  * Plugin Name:       Newsletter Glue wp_mail() Integration
  * Plugin URI:        http://github.com/BrianHenryIE/bh-wp-ngl-wp-mail/
  * Description:       Adds WordPress's native email sender as an option in Newsletter glue.
- * Version:           1.0.0
+ * Version:           0.1.0
  * Requires PHP:      7.4
  * Author:            BrianHenryIE
  * Author URI:        http://example.com/
@@ -43,7 +43,7 @@ if ( ! defined( 'WPINC' ) ) {
 
 require_once plugin_dir_path( __FILE__ ) . 'autoload.php';
 
-define( 'BH_WP_NGL_WP_MAIL_VERSION', '1.0.0' );
+define( 'BH_WP_NGL_WP_MAIL_VERSION', '0.1.0' );
 define( 'BH_WP_NGL_WP_MAIL_BASENAME', plugin_basename( __FILE__ ) );
 define( 'BH_WP_NGL_WP_MAIL_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
